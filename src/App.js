@@ -1,25 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+// src/App.js
+import React from 'react';
+import ChatWindow from './components/ChatWindow';
+import GlobalStyles from './styles/GlobalStyles';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import ChatroomCode from './components/ChatroomCode';
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<ChatroomCode />} />
+        <Route path="/chatroom/:code" element={<ChatWindow />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
