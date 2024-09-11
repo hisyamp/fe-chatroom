@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import io from 'socket.io-client';
+import axios from 'axios';
 import Message from './Message';
 import InputBox from './InputBox';
 
-const socket = io('http://localhost:4000'); // Replace with your server URL
+const socket = io('http://54.179.52.46:4000');
 
-// Helper function to generate random colors
 const getRandomColor = () => {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -17,58 +17,22 @@ const getRandomColor = () => {
 };
 
 const ChatWindow = () => {
-    const [messages, setMessages] = useState([
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" },
-        { text: "Hello!", sender: "other" },
-        { text: "How are you?", sender: "other" },
-        { text: "I'm fine, thank you!", sender: "user" },
-        { text: "What's up?", sender: "user" },
-        { text: "Let's build this chat!", sender: "other" }
-    ]);
+    const [messages, setMessages] = useState([]);
     const [headerColor, setHeaderColor] = useState(getRandomColor());
     const [input, setInput] = useState('');
+    const messagesEndRef = useRef(null);
+    const chatroomId = '123';
 
-    const messagesEndRef = useRef(null);  // Create a ref for the end of the messages container
+    // Fetch initial messages from the API using axios
+    useEffect(() => {
+        axios.get(`http://54.179.52.46:3000/api/v1/chatrooms/${chatroomId}`)
+            .then((response) => {
+                setMessages(response.data.messages);
+            })
+            .catch((error) => console.error('Error fetching chatroom messages:', error));
+    }, [chatroomId]);
 
+    // Handle incoming WebSocket messages
     useEffect(() => {
         socket.on('message', (message) => {
             setMessages((prevMessages) => [...prevMessages, message]);
@@ -99,9 +63,18 @@ const ChatWindow = () => {
         e.preventDefault();
         if (input.trim() !== "") {
             const newMessage = { text: input, sender: "user" };
-            socket.emit('message', newMessage);
-            setMessages((prevMessages) => [...prevMessages, newMessage]);
-            setInput('');
+
+            // Send message via POST request using axios
+            axios.post(`http://54.179.52.46:3000/api/v1/chatrooms`, {
+                chatroomId: chatroomId,
+                message: newMessage,
+            })
+                .then((response) => {
+                    // Assuming the API returns the saved message
+                    setMessages((prevMessages) => [...prevMessages, response.data.message]);
+                    setInput('');
+                })
+                .catch((error) => console.error('Error sending message:', error));
         }
     };
 
@@ -115,7 +88,6 @@ const ChatWindow = () => {
                 {messages.map((msg, index) => (
                     <Message key={index} text={msg.text} sender={msg.sender} />
                 ))}
-                {/* This div is used to ensure the scroll to the bottom */}
                 <div ref={messagesEndRef} />
             </MessagesContainer>
 
