@@ -4,10 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { InputContainer, TextInput, SubmitButton } from './InputBoxStyles';
 
+
+
 const InputBox = ({ value, onChange, onSubmit }) => {
   return (
     <InputContainer>
-      <form onSubmit={onSubmit}>
+      <form>
         <TextInput
           type="text"
           value={value}
@@ -16,7 +18,7 @@ const InputBox = ({ value, onChange, onSubmit }) => {
           autoComplete="off"
         />
       </form>
-      <SubmitButton type="submit">
+      <SubmitButton type="submit" onClick={onSubmit={onSubmit}}>
         <FontAwesomeIcon icon={faPaperPlane} />
       </SubmitButton>
     </InputContainer>
