@@ -5,10 +5,11 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import Message from './Message';
 import InputBox from './InputBox';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FiCopy } from 'react-icons/fi'; // Import the copy icon
 
-const url = "http://18.141.187.131:3000"
+const url = "http://localhost:3000"
+// const url = "http://18.141.187.131:3000"
 const url_ws = "http://18.141.187.131:4000"
 const socket = io(url_ws);
 
@@ -25,12 +26,13 @@ const ChatWindow = () => {
     const [messages, setMessages] = useState([]);
     const [headerColor, setHeaderColor] = useState(getRandomColor());
     const [input, setInput] = useState('');
+    const [room, setRoom] = useState({});
+    const [title, setTitle] = useState("");
     const messagesEndRef = useRef(null);
     const { code } = useParams();
-
+    const navigate = useNavigate();
     const userName = localStorage.getItem('name');
 
-    // SweetAlert for name input
     useEffect(() => {
         if (!userName) {
             Swal.fire({
@@ -49,31 +51,36 @@ const ChatWindow = () => {
             }).then((result) => {
                 if (result.value) {
                     localStorage.setItem('name', result.value);
-                    window.location.reload(); // Reload to apply the new name
+                    window.location.reload(); 
                 }
             });
         }
     }, [userName]);
 
-    // Fetch initial messages
     useEffect(() => {
         axios.get(`${url}/api/v1/chatrooms/${code}`)
             .then((response) => {
-                setMessages(response.data.messages);
+                if(response.data.messages) {
+                    setMessages(response.data.messages);
+                    
+                    console.log(response)
+                }
+                else setMessages([]);
+                setRoom(response.data)
+                    setTitle(response.data.name)
             })
             .catch((error) => console.error('Error fetching chatroom messages:', error));
     }, [code]);
 
-    // Handle incoming WebSocket messages
     useEffect(() => {
         socket.on('new_data', (message) => {
-            setMessages(message);
+            console.log(message)
+            setMessages(message.messages);
         });
 
         return () => socket.off('new_data');
     }, []);
 
-    // Change header color
     useEffect(() => {
         const colorInterval = setInterval(() => {
             setHeaderColor(getRandomColor());
@@ -82,7 +89,6 @@ const ChatWindow = () => {
         return () => clearInterval(colorInterval);
     }, []);
 
-    // Scroll to the bottom when new messages arrive
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
@@ -109,31 +115,52 @@ const ChatWindow = () => {
         }
     };
 
-    // Function to copy the code param
     const handleCopyCode = () => {
-        navigator.clipboard.writeText(code)
+        const currentUrl = window.location.href;
+        navigator.clipboard.writeText(currentUrl)
             .then(() => {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Code copied!',
-                    text: `Chatroom code "${code}" has been copied to your clipboard. Share to your friend!`,
+                    title: 'Link copied!',
+                    text: `Chatroom url "${currentUrl}" has been copied to your clipboard. Share to your friend!`,
                     timer: 2000,
                     showConfirmButton: false,
                     toast: true,
                     position: 'top-end'
                 });
             })
-            .catch((error) => console.error('Error copying code:', error));
+            .catch((error) => console.error('Error copying url:', error));
+    };
+
+    const handleLeaveRoom = () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will leave this chatroom.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Leave',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                navigate('/'); // Redirect to homepage or another page
+            }
+        });
     };
 
     return (
         <ChatContainer>
             <ChatHeader style={{ backgroundColor: headerColor }}>
-                <h2>Chatroom: Bahaya</h2>
-                <CopyButton onClick={handleCopyCode}>
-                    <FiCopy size={20} /> {/* Add copy icon */}
-                    <span>{code}</span>
-                </CopyButton>
+                <h2>{title}</h2>
+                <CenterCopyButton>
+                    <CopyButton onClick={handleCopyCode}>
+                        <FiCopy size={20} /> {/* Add copy icon */}
+                        <span>Share to youre friend!</span>
+                    </CopyButton>
+                </CenterCopyButton>
+                <LeaveButton onClick={handleLeaveRoom}>
+                    Leave Room
+                </LeaveButton>
             </ChatHeader>
 
             <MessagesContainer>
@@ -170,10 +197,16 @@ const ChatHeader = styled.div`
   text-align: center;
   font-size: 1.5rem;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-  position: relative; /* Make sure the copy button is properly positioned */
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+const CenterCopyButton = styled.div`
+  flex-grow: 1; /* Allow this container to take all available space */
+  display: flex;
+  justify-content: center; /* Center the copy button */
 `;
 
 const CopyButton = styled.button`
@@ -193,6 +226,21 @@ const CopyButton = styled.button`
 
   span {
     margin-left: 8px; /* Add some space between the icon and the text */
+  }
+`;
+
+const LeaveButton = styled.button`
+  background-color: #d33;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+  margin-right:10px;
+  
+  &:hover {
+    background-color: #b52c2c;
   }
 `;
 
