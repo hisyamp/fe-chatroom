@@ -10,8 +10,8 @@ const ChatroomCode = () => {
   const [error, setError] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#f0f0f0');
   const navigate = useNavigate();
-  // const url = "http://18.141.187.131:3000";
-  const url = "http://localhost:3000";
+  const url = "http://18.141.187.131:3000";
+  // const url = "http://localhost:3000";
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
     const red = Math.min(255, Math.floor((clientX / window.innerWidth) * 255));
