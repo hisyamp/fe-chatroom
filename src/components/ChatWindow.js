@@ -9,8 +9,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiCopy } from 'react-icons/fi'; // Import the copy icon
 
 // const url = "http://localhost:3000"
-const url = "http://18.141.187.131:3000"
-const url_ws = "http://18.141.187.131:4000"
+const url = "http://13.250.107.199:3000"
+const url_ws = "http://13.250.107.199:4000"
 const socket = io(url_ws);
 
 const getRandomColor = () => {
