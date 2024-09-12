@@ -20,7 +20,7 @@ export const FormContainer = styled.form`
   max-width: 1200px;         /* Optional max width for larger screens */
 `;
 
-export const TextInput = styled.input`
+export const TextArea = styled.input`
   flex: 1;                  /* Take up available space */
   padding: 10px;
   border: 1px solid #ddd;

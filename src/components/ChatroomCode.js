@@ -1,38 +1,42 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-
+import axios from 'axios';
 const ChatroomCode = () => {
-    const [code, setCode] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // Validate the chatroom code (simple example)
-        if (code === '12345') {  // Replace with your actual validation logic
-            navigate(`/chatroom/${code}`);  // Redirect to the chatroom
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const url = "http://18.141.187.131:3000"
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    axios.get(`${url}/api/v1/chatrooms/${code}`)
+      .then((response) => {
+        console.log("response.data", response.data)
+        if (response?.data) {
+          navigate(`/chatroom/${code}`);
         } else {
-            setError('Invalid code. Please try again.');
+          setError('Invalid code. Please try again.');
         }
-    };
+      })
+      .catch((error) => setError('Invalid code. Please try again.'));
 
-    return (
-        <Container>
-            <FormContainer onSubmit={handleSubmit}>
-                <h2>Enter Chatroom Code</h2>
-                <Input
-                    type="text"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Enter code"
-                />
-                <SubmitButton type="submit">Join Chatroom</SubmitButton>
-                {error && <ErrorMessage>{error}</ErrorMessage>}
-            </FormContainer>
-        </Container>
-    );
+  };
+
+  return (
+    <Container>
+      <FormContainer onSubmit={handleSubmit}>
+        <h2>Enter Chatroom Code</h2>
+        <Input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="Enter code"
+        />
+        <SubmitButton type="submit">Join Chatroom</SubmitButton>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+      </FormContainer>
+    </Container>
+  );
 };
 
 const Container = styled.div`
