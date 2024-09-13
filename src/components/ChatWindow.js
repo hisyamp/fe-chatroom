@@ -131,16 +131,24 @@ const ChatWindow = () => {
                         position: 'top-end'
                     });
                 })
-                .catch((error) => console.error('Error copying URL:', error));
+                .catch((error) => {
+                    console.error('Error copying URL:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        html: `Error copying URL. You can still copy it manually: <a href="${currentUrl}" target="_blank">${currentUrl}</a>`,
+                    });
+                });
         } else {
             console.error('Clipboard API not supported');
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Clipboard API not supported in this browser!',
+                html: `Clipboard API not supported in this browser. You can still copy the link manually: <a href="${currentUrl}" target="_blank">${currentUrl}</a>`,
             });
         }
     };
+
 
 
     const handleLeaveRoom = () => {
