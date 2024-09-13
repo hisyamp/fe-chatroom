@@ -117,20 +117,31 @@ const ChatWindow = () => {
 
     const handleCopyCode = () => {
         const currentUrl = window.location.href;
-        navigator.clipboard.writeText(currentUrl)
-            .then(() => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Link copied!',
-                    text: `Chatroom url "${currentUrl}" has been copied to your clipboard. Share to your friend!`,
-                    timer: 2000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
-                });
-            })
-            .catch((error) => console.error('Error copying url:', error));
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(currentUrl)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Link copied!',
+                        text: `Chatroom URL "${currentUrl}" has been copied to your clipboard. Share it with your friend!`,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                })
+                .catch((error) => console.error('Error copying URL:', error));
+        } else {
+            console.error('Clipboard API not supported');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Clipboard API not supported in this browser!',
+            });
+        }
     };
+
 
     const handleLeaveRoom = () => {
         Swal.fire({
