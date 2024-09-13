@@ -10,7 +10,7 @@ const ChatroomCode = () => {
   const [error, setError] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#f0f0f0');
   const navigate = useNavigate();
-  const url = "http://13.250.107.199:3000";
+  const url = "http://54.255.106.216:3000";
   // const url = "http://localhost:3000";
   const handleMouseMove = (e) => {
     const { clientX, clientY } = e;
@@ -81,9 +81,11 @@ const ChatroomCode = () => {
         // })
         // return
         axios.post(`${url}/api/v1/chatrooms`, {
-          "chatroom": {name,
+          "chatroom": {
+            name,
             description,
-            created_by}
+            created_by
+          }
         }).then(response => {
           console.log(response.data)
           navigate(`/chatroom/${response?.data?._id}`);

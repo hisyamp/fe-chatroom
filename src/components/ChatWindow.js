@@ -9,8 +9,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiCopy } from 'react-icons/fi'; // Import the copy icon
 
 // const url = "http://localhost:3000"
-const url = "http://13.250.107.199:3000"
-const url_ws = "http://13.250.107.199:4000"
+const url = "http://54.255.106.216:3000"
+const url_ws = "http://18.136.195.235:4000"
 const socket = io(url_ws);
 
 const getRandomColor = () => {
@@ -51,7 +51,7 @@ const ChatWindow = () => {
             }).then((result) => {
                 if (result.value) {
                     localStorage.setItem('name', result.value);
-                    window.location.reload(); 
+                    window.location.reload();
                 }
             });
         }
@@ -60,14 +60,14 @@ const ChatWindow = () => {
     useEffect(() => {
         axios.get(`${url}/api/v1/chatrooms/${code}`)
             .then((response) => {
-                if(response.data.messages) {
+                if (response.data.messages) {
                     setMessages(response.data.messages);
-                    
+
                     console.log(response)
                 }
                 else setMessages([]);
                 setRoom(response.data)
-                    setTitle(response.data.name)
+                setTitle(response.data.name)
             })
             .catch((error) => console.error('Error fetching chatroom messages:', error));
     }, [code]);
